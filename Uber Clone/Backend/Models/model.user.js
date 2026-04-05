@@ -33,10 +33,14 @@ userSchema.methods.createToken = function () {
   if (!process.env.JWT_KEY) {
     throw new Error("Jwt key not defined");
   }
-  const token = jwt.sign({ id: this._id }, process.env.JWT_KEY);
+  const token = jwt.sign({ id: this._id }, process.env.JWT_KEY, {
+    expiresIn: "7d",
+  });
   return token;
 };
-
+userSchema.methods.comparePassword = async function (password) {
+  return await bcrypt.compare(password, this.password);
+};
 userSchema.statics.hashPassword = async function (password) {
   const hashed = await bcrypt.hash(password, 10);
   return hashed;
