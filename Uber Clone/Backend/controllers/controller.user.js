@@ -9,7 +9,7 @@ async function registerUser(req, res) {
   console.log(repeatedEmail);
 
   if (repeatedEmail) {
-    return res.json({ message: "Cant use repeated email" });
+    return res.status(409).json({ message: "Can't use repeated email" });
   }
   const hashedPassword = await User.hashPassword(password);
   const user = await createUser(firstName, secondName, email, hashedPassword);
@@ -52,6 +52,9 @@ function getProfile(req, res) {
 //logut
 async function logoutUser(req, res) {
   const token = req.cookies.token || req.headers.authorization?.split(" ")[1];
+  if (!token) {
+    return res.status(401).json({ message: "Unauthorized" });
+  }
   res.clearCookie("token");
 
   await blTokens.create({ token });

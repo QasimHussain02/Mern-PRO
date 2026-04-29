@@ -6,13 +6,21 @@ import UserLogin from "./Pages/UserLogin";
 import CaptainLogin from "./Pages/CaptainLogin";
 import CaptainSignup from "./Pages/CaptainSignup";
 import { Layout } from "./Pages/Layout";
+import UserProtectedRoute from "./Pages/UserProtectedRoute";
 
 function App() {
   return (
     <Routes>
       <Route path="/" element={<Layout />}>
         <Route index element={<Start />} />
-        <Route path="/home" element={<Home />} />
+        <Route
+          path="/home"
+          element={
+            <UserProtectedRoute>
+              <Home />
+            </UserProtectedRoute>
+          }
+        />
         <Route path="/UserSignup" element={<UserSignup />} />
         <Route path="/UserLogin" element={<UserLogin />} />
         <Route path="/CaptainLogin" element={<CaptainLogin />} />

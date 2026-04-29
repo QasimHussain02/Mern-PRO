@@ -19,6 +19,7 @@ import { NavLink } from "react-router";
 
 const CaptainSignup = () => {
   const [showPassword, setShowPassword] = useState(false);
+
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
@@ -61,8 +62,10 @@ const CaptainSignup = () => {
   };
 
   const handleChange = (e) => {
+    // console.log(e.target.name, e.target.value);
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
+    // console.log(formData);
     validate(name, value);
   };
 

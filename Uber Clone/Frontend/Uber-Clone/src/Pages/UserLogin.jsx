@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 // eslint-disable-next-line no-unused-vars
 import { motion } from "framer-motion";
 import {
@@ -11,11 +11,19 @@ import {
   Navigation,
   Link,
 } from "lucide-react";
-import { NavLink } from "react-router";
+import { NavLink, useNavigate } from "react-router";
+import axios from "axios";
+import { userDataContext } from "../context/UserContext";
 
 const UserLogin = () => {
   const [showPassword, setShowPassword] = useState(false);
-
+  const [userLoginForm, setUserLoginForm] = useState({
+    email: "",
+    password: "",
+  });
+  const [error, setError] = useState("");
+  const { userData, setUserData } = useContext(userDataContext);
+  const navigate = useNavigate();
   // Animation Variants
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -29,7 +37,42 @@ const UserLogin = () => {
     hidden: { y: 15, opacity: 0 },
     visible: { y: 0, opacity: 1, transition: { duration: 0.4 } },
   };
+  function onChange(e) {
+    const { name, value } = e.target;
+    setUserLoginForm((prev) => {
+      return { ...prev, [name]: value };
+    });
+    console.log(userLoginForm);
+  }
+  async function submitForm(e) {
+    setError("");
+    e.preventDefault();
+    if (!userLoginForm.email || !userLoginForm.password) {
+      setError("Make sure all fields are filled properly");
+      return;
+    }
+    const user = {
+      email: userLoginForm.email,
+      password: userLoginForm.password,
+    };
+    try {
+      const res = await axios.post(
+        `${import.meta.env.VITE_API_URL}/api/user/login`,
+        user,
+      );
+      // console.log(res.data.user);
+      setUserData(res.data.user);
+      localStorage.setItem("token", res.data.token);
+      console.log(userData);
 
+      navigate("/home");
+    } catch (err) {
+      console.log(err.response.data.message);
+      if (err.response) {
+        setError(err.response.data.message || "Something went wrong");
+      }
+    }
+  }
   return (
     <>
       {/* --- BACKGROUND ORBS --- */}
@@ -61,7 +104,7 @@ const UserLogin = () => {
             </h2>
           </motion.div>
 
-          <form className="space-y-3" onSubmit={(e) => e.preventDefault()}>
+          <form className="space-y-3" onSubmit={submitForm}>
             {/* Email Field */}
             <motion.div variants={itemVariants} className="space-y-1.5">
               <label className="text-[10px] font-semibold text-gray-400 ml-1 uppercase tracking-widest">
@@ -71,6 +114,8 @@ const UserLogin = () => {
                 <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-500 group-focus-within:text-blue-400 transition-colors" />
                 <input
                   type="email"
+                  name="email"
+                  onChange={onChange}
                   placeholder="name@example.com"
                   className="w-full bg-white/[0.05] border border-white/5 rounded-xl py-2.5 pl-9 pr-3 text-xs focus:outline-none focus:border-blue-500/50 focus:bg-white/[0.08] transition-all"
                 />
@@ -86,6 +131,8 @@ const UserLogin = () => {
                 <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-500 group-focus-within:text-blue-400 transition-colors" />
                 <input
                   type={showPassword ? "text" : "password"}
+                  name="password"
+                  onChange={onChange}
                   placeholder="••••••••"
                   className="w-full bg-white/[0.05] border border-white/5 rounded-xl py-2.5 pl-9 pr-10 text-xs focus:outline-none focus:border-blue-500/50 focus:bg-white/[0.08] transition-all"
                 />
@@ -96,6 +143,9 @@ const UserLogin = () => {
                 >
                   {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
                 </button>
+                <div className="w-full text-sm text-center text-red-500">
+                  {error}
+                </div>
               </div>
             </motion.div>
 

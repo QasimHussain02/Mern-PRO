@@ -1,6 +1,7 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 // eslint-disable-next-line no-unused-vars
 import { motion } from "framer-motion";
+import axios from "axios";
 import {
   User,
   Mail,
@@ -11,11 +12,63 @@ import {
   Navigation,
   Link,
 } from "lucide-react";
-import { NavLink } from "react-router";
+import { NavLink, useNavigate } from "react-router";
+import { userDataContext } from "../context/UserContext";
 
 const UserSignup = () => {
   const [showPassword, setShowPassword] = useState(false);
+  const [error, setError] = useState("");
+  const [userSignupForm, setUserSignupForm] = useState({
+    firstName: "",
+    lastName: "",
+    email: "",
+    password: "",
+  });
+  const navigate = useNavigate();
+  function onChange(e) {
+    const { name, value } = e.target;
+    setUserSignupForm((prev) => ({ ...prev, [name]: value }));
+    console.log(userSignupForm);
+  }
+  const { setUserData } = useContext(userDataContext);
 
+  async function submitForm(e) {
+    setError("");
+    e.preventDefault();
+    if (
+      !userSignupForm.firstName ||
+      !userSignupForm.lastName ||
+      !userSignupForm.email ||
+      !userSignupForm.password
+    ) {
+      setError("Make sure all fields are filled properly");
+      return;
+    }
+    const newUser = {
+      fullName: {
+        firstName: userSignupForm.firstName,
+        secondName: userSignupForm.lastName,
+      },
+      email: userSignupForm.email,
+      password: userSignupForm.password,
+    };
+    try {
+      const res = await axios.post(
+        `${import.meta.env.VITE_API_URL}/api/user/register`,
+        newUser,
+      );
+      // console.log(res.data.user);
+      setUserData(res.data.user);
+      localStorage.setItem("token", res.data.token);
+      navigate("/home");
+      // console.log(userData);
+    } catch (err) {
+      console.log(err.response.data.message);
+      if (err.response) {
+        setError(err.response.data.message || "Something went wrong");
+      }
+    }
+  }
   // Animation Variants
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -66,7 +119,7 @@ const UserSignup = () => {
             </p>
           </motion.div>
 
-          <form className="space-y-3" onSubmit={(e) => e.preventDefault()}>
+          <form className="space-y-3" onSubmit={submitForm}>
             {/* Name Row */}
             <div className="grid grid-cols-2 gap-3">
               <motion.div variants={itemVariants} className="space-y-1.5">
@@ -77,6 +130,8 @@ const UserSignup = () => {
                   <User className="absolute left-3.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-500 group-focus-within:text-blue-400 transition-colors" />
                   <input
                     type="text"
+                    name="firstName"
+                    onChange={onChange}
                     placeholder="John"
                     className="w-full bg-white/[0.05] border border-white/5 rounded-xl py-2.5 pl-9 pr-3 text-xs focus:outline-none focus:border-blue-500/50 focus:bg-white/[0.08] transition-all"
                   />
@@ -89,6 +144,8 @@ const UserSignup = () => {
                 </label>
                 <input
                   type="text"
+                  name="lastName"
+                  onChange={onChange}
                   placeholder="Doe"
                   className="w-full bg-white/[0.05] border border-white/5 rounded-xl py-2.5 px-3 text-xs focus:outline-none focus:border-blue-500/50 focus:bg-white/[0.08] transition-all"
                 />
@@ -104,6 +161,8 @@ const UserSignup = () => {
                 <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-500 group-focus-within:text-blue-400 transition-colors" />
                 <input
                   type="email"
+                  name="email"
+                  onChange={onChange}
                   placeholder="name@example.com"
                   className="w-full bg-white/[0.05] border border-white/5 rounded-xl py-2.5 pl-9 pr-3 text-xs focus:outline-none focus:border-blue-500/50 focus:bg-white/[0.08] transition-all"
                 />
@@ -119,6 +178,8 @@ const UserSignup = () => {
                 <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-500 group-focus-within:text-blue-400 transition-colors" />
                 <input
                   type={showPassword ? "text" : "password"}
+                  name="password"
+                  onChange={onChange}
                   placeholder="••••••••"
                   className="w-full bg-white/[0.05] border border-white/5 rounded-xl py-2.5 pl-9 pr-10 text-xs focus:outline-none focus:border-blue-500/50 focus:bg-white/[0.08] transition-all"
                 />
@@ -144,6 +205,10 @@ const UserSignup = () => {
                 Create Account <ArrowRight size={16} />
               </span>
             </motion.button>
+
+            <div className="w-full text-sm text-center text-red-500">
+              {error}
+            </div>
           </form>
 
           {/* Footer Link */}

@@ -15,7 +15,16 @@ import { NavLink } from "react-router";
 
 const CaptainLogin = () => {
   const [showPassword, setShowPassword] = useState(false);
+  const [captainLoginForm, setCaptainLoginForm] = useState({
+    email: "",
+    password: "",
+  });
 
+  function handleChange(e) {
+    const { name, value } = e.target;
+    setCaptainLoginForm((prev) => ({ ...prev, [name]: value }));
+    // console.log(captainLoginForm);
+  }
   // Animation Variants
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -71,6 +80,8 @@ const CaptainLogin = () => {
                 <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-500 group-focus-within:text-blue-400 transition-colors" />
                 <input
                   type="email"
+                  name="email"
+                  onChange={handleChange}
                   placeholder="name@example.com"
                   className="w-full bg-white/[0.05] border border-white/5 rounded-xl py-2.5 pl-9 pr-3 text-xs focus:outline-none focus:border-blue-500/50 focus:bg-white/[0.08] transition-all"
                 />
@@ -86,6 +97,8 @@ const CaptainLogin = () => {
                 <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-500 group-focus-within:text-blue-400 transition-colors" />
                 <input
                   type={showPassword ? "text" : "password"}
+                  onChange={handleChange}
+                  name="password"
                   placeholder="••••••••"
                   className="w-full bg-white/[0.05] border border-white/5 rounded-xl py-2.5 pl-9 pr-10 text-xs focus:outline-none focus:border-blue-500/50 focus:bg-white/[0.08] transition-all"
                 />
