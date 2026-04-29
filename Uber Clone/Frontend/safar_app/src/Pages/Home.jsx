@@ -6,14 +6,11 @@ export const Home = () => {
   const navigate = useNavigate();
   async function logout() {
     try {
-      const res = await axios.get(
-        `${import.meta.env.VITE_API_URL}/api/user/logout`,
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
+      await axios.get(`${import.meta.env.VITE_API_URL}/api/user/logout`, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
-      );
+      });
 
       localStorage.removeItem("token");
       navigate("/UserLogin");
