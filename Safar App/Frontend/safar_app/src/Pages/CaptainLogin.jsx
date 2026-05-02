@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 // eslint-disable-next-line no-unused-vars
 import { motion } from "framer-motion";
 import {
@@ -11,7 +11,9 @@ import {
   Navigation,
   Link,
 } from "lucide-react";
-import { NavLink } from "react-router";
+import { NavLink, useNavigate } from "react-router";
+import axios from "axios";
+import { CaptainContext } from "../context/CaptainContext";
 
 const CaptainLogin = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -19,11 +21,41 @@ const CaptainLogin = () => {
     email: "",
     password: "",
   });
-
+  const navigate = useNavigate();
+  const [error, setError] = useState("");
   function handleChange(e) {
     const { name, value } = e.target;
     setCaptainLoginForm((prev) => ({ ...prev, [name]: value }));
     // console.log(captainLoginForm);
+  }
+  const CaptainData = useContext(CaptainContext);
+  const { updateCaptain } = CaptainData;
+  async function submitCaptainLogin(e) {
+    setError("");
+    e.preventDefault();
+    try {
+      if (!captainLoginForm.email || !captainLoginForm.password) {
+        setError("Please fill all the required fields first");
+        return;
+      }
+      const captain = {
+        email: captainLoginForm.email,
+        password: captainLoginForm.password,
+      };
+      const response = await axios.post(
+        `${import.meta.env.VITE_API_URL}/api/captains/login`,
+        captain,
+      );
+      console.log(response.data.message);
+
+      updateCaptain(response.data.user);
+      localStorage.setItem("captainToken", response.data.token);
+      navigate("/captainHome");
+    } catch (err) {
+      if (err.response) {
+        setError(err.response.data.message || "Something went wrong");
+      }
+    }
   }
   // Animation Variants
   const containerVariants = {
@@ -70,7 +102,7 @@ const CaptainLogin = () => {
             </h2>
           </motion.div>
 
-          <form className="space-y-3" onSubmit={(e) => e.preventDefault()}>
+          <form className="space-y-3" onSubmit={submitCaptainLogin}>
             {/* Email Field */}
             <motion.div variants={itemVariants} className="space-y-1.5">
               <label className="text-[10px] font-semibold text-gray-400 ml-1 uppercase tracking-widest">
@@ -81,6 +113,7 @@ const CaptainLogin = () => {
                 <input
                   type="email"
                   name="email"
+                  value={captainLoginForm.email}
                   onChange={handleChange}
                   placeholder="name@example.com"
                   className="w-full bg-white/[0.05] border border-white/5 rounded-xl py-2.5 pl-9 pr-3 text-xs focus:outline-none focus:border-blue-500/50 focus:bg-white/[0.08] transition-all"
@@ -98,6 +131,7 @@ const CaptainLogin = () => {
                 <input
                   type={showPassword ? "text" : "password"}
                   onChange={handleChange}
+                  value={captainLoginForm.password}
                   name="password"
                   placeholder="••••••••"
                   className="w-full bg-white/[0.05] border border-white/5 rounded-xl py-2.5 pl-9 pr-10 text-xs focus:outline-none focus:border-blue-500/50 focus:bg-white/[0.08] transition-all"
@@ -111,7 +145,7 @@ const CaptainLogin = () => {
                 </button>
               </div>
             </motion.div>
-
+            <p className="w-full text-red-500 text-sm text-center">{error}</p>
             {/* Submit Button */}
             <motion.button
               variants={itemVariants}

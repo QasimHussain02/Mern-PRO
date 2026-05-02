@@ -7,7 +7,7 @@ const {
   getProfile,
   logoutCaptain,
 } = require("../controllers/captains.controller");
-
+//     /api/captains
 //Register
 router.post("/register", createCaptain);
 //Login

@@ -42,7 +42,7 @@ const UserLogin = () => {
     setUserLoginForm((prev) => {
       return { ...prev, [name]: value };
     });
-    console.log(userLoginForm);
+    // console.log(userLoginForm);
   }
   async function submitForm(e) {
     setError("");
@@ -67,7 +67,7 @@ const UserLogin = () => {
 
       navigate("/home");
     } catch (err) {
-      console.log(err.response.data.message);
+      // console.log(err.response.data.message);
       if (err.response) {
         setError(err.response.data.message || "Something went wrong");
       }

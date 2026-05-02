@@ -37,7 +37,6 @@ const UserSignup = () => {
     e.preventDefault();
     if (
       !userSignupForm.firstName ||
-      !userSignupForm.lastName ||
       !userSignupForm.email ||
       !userSignupForm.password
     ) {

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 // eslint-disable-next-line no-unused-vars
 import { motion, AnimatePresence } from "framer-motion";
 import {
@@ -15,7 +15,9 @@ import {
   Users,
   ChevronDown,
 } from "lucide-react";
-import { NavLink } from "react-router";
+import { NavLink, useNavigate } from "react-router";
+import { CaptainContext } from "../context/CaptainContext";
+import axios from "axios";
 
 const CaptainSignup = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -32,6 +34,7 @@ const CaptainSignup = () => {
   });
 
   const [errors, setErrors] = useState({});
+  const navigate = useNavigate();
 
   // Validation Logic
   const validate = (name, value) => {
@@ -65,7 +68,6 @@ const CaptainSignup = () => {
     // console.log(e.target.name, e.target.value);
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
-    // console.log(formData);
     validate(name, value);
   };
 
@@ -81,6 +83,56 @@ const CaptainSignup = () => {
     hidden: { y: 10, opacity: 0 },
     visible: { y: 0, opacity: 1 },
   };
+  const CaptainData = useContext(CaptainContext);
+  const { updateCaptain } = CaptainData;
+
+  async function submitCaptainSignup(e) {
+    e.preventDefault();
+    setErrors({});
+    try {
+      if (
+        !formData.firstName ||
+        !formData.email ||
+        !formData.email ||
+        !formData.password ||
+        !formData.vehicleType ||
+        !formData.color ||
+        !formData.plate ||
+        !formData.capacity
+      ) {
+        setErrors((prev) => ({
+          ...prev,
+          message: "Kindly fill all the requierd fields",
+        }));
+        return;
+      }
+      const newCaptain = {
+        fullName: {
+          firstName: formData.firstName,
+          lastName: formData.lastName,
+        },
+        email: formData.email,
+        password: formData.password,
+        vehicle: {
+          color: formData.color,
+          capacity: formData.capacity,
+          vehicleType: formData.vehicleType,
+          plate: formData.plate,
+        },
+      };
+      const response = await axios.post(
+        `${import.meta.env.VITE_API_URL}/api/captains/register`,
+        newCaptain,
+      );
+      console.log(response);
+
+      updateCaptain(response.data.captain);
+      localStorage.setItem("captainToken", response.data.token);
+      navigate("/captainHome");
+    } catch (err) {
+      console.error(err);
+    }
+  }
 
   return (
     <>
@@ -106,7 +158,7 @@ const CaptainSignup = () => {
             </p>
           </motion.div>
 
-          <form className="space-y-3" onSubmit={(e) => e.preventDefault()}>
+          <form className="space-y-3" onSubmit={submitCaptainSignup}>
             {/* Name Row */}
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-1">
@@ -267,6 +319,9 @@ const CaptainSignup = () => {
                 )}
               </div>
             </div>
+            <p className="w-full text-red-500 text-sm text-center">
+              {errors.message}
+            </p>
 
             {/* Submit */}
             <motion.button
