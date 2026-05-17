@@ -28,7 +28,7 @@ const UserSignup = () => {
   function onChange(e) {
     const { name, value } = e.target;
     setUserSignupForm((prev) => ({ ...prev, [name]: value }));
-    console.log(userSignupForm);
+    // console.log(userSignupForm);
   }
   const { setUserData } = useContext(userDataContext);
 

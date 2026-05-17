@@ -7,7 +7,7 @@ export const Layout = () => {
     <>
       <div className="relative h-screen w-full bg-[#050505] text-white overflow-hidden font-sans flex flex-col">
         <Navbar></Navbar>
-        <main>
+        <main className="flex-grow overflow-hidden relative">
           <Outlet />
         </main>
       </div>
