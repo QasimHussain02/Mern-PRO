@@ -5,7 +5,7 @@ const Captain = require("../Models/captains.model");
 async function verifyToken(req, res, next) {
   try {
     const token = req.cookies.token || req.headers.authorization?.split(" ")[1];
-    console.log(token);
+    // console.log(token);
 
     if (!token) {
       return res.json({ message: "unauthorized" });
@@ -33,7 +33,7 @@ async function verifyCaptainToken(req, res, next) {
       return res.status(404).json({ message: "Token is undefined" });
     }
     const blackListedToken = blacklistedToken.findOne({ token });
-    if (blacklistedToken) {
+    if (blackListedToken) {
       res.status(401).json({ message: "Unauthorized" });
     }
     const decoded = jwt.verify(token, process.env.JWT_KEY);

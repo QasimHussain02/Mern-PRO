@@ -8,6 +8,7 @@ import CaptainSignup from "./Pages/CaptainSignup";
 import { Layout } from "./Pages/Layout";
 import UserProtectedRoute from "./Pages/UserProtectedRoute";
 import CaptainProtectedRoute from "./Pages/CaptainProtectedRoute";
+import CaptainHome from "./Pages/CaptainHome";
 
 function App() {
   return (
@@ -26,7 +27,7 @@ function App() {
           path="/captainHome"
           element={
             <CaptainProtectedRoute>
-              <Home />
+              <CaptainHome />
             </CaptainProtectedRoute>
           }
         />

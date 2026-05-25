@@ -70,6 +70,8 @@ const UserLogin = () => {
       // console.log(err.response.data.message);
       if (err.response) {
         setError(err.response.data.message || "Something went wrong");
+      } else {
+        setError("Can't connect to server right now, Try again later");
       }
     }
   }
